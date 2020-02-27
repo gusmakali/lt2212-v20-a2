@@ -1,22 +1,22 @@
 import argparse
 import random
-from sklearn.dataset import fetch_20newsgroups 
-from sklearn.base import is_cllasifier
+from sklearn.datasets import fetch_20newsgroups 
+from sklearn.base import is_classifier
 import numpy as np
-from collection import Counter 
+from collections import Counter 
 from nltk.tokenize import word_tokenize 
-import panda as pd 
+import pandas as pd 
 
 from numpy.linalg import svd 
 from sklearn.decomposition import TruncatedSVD
 from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DesisionTreeClassifier 
-from sklearn.utils import KNeighborsClassifier 
+from sklearn.tree import DecisionTreeClassifier 
+from sklearn.neighbors import KNeighborsClassifier 
 from sklearn.utils import shuffle
-from sklearn.matrics import accuracy_score
+from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report 
-from sklearn.feature_extraction.text import TfidfVectoriser
-from sklearn.feature_extraction.text import TfidfTrasformer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 
 random.seed(42)
@@ -36,10 +36,10 @@ def word_counts(lsls, n=0):
     to_df = []
     for count in Counter(lsls).most_common():
         if count[1] > n and count[0].isalpha():
-            to_df.appent(count)
+            to_df.append(count)
     return to_df 
 
-def tf_idf(tf, totaldocs, docswithword):
+def tfidf(tf, totaldocs, docswithword):
     return tf * np.log10(totaldocs / (docswithword + 1))
 
 def doc_count(df, word):
@@ -64,30 +64,30 @@ def extract_features(samples):
     # return tf_idf_vector.toarray()
 
     column = {}
-    word_counts = {}
+    wordcounts = {}
     for i, f in enumerate(samples):
-       words_and_counts = word_counts(word_tokenize(f.lower())))
+        words_and_counts = word_counts(word_tokenize(f.lower()))
 
-       if len(words_and_counts) == 0:
+        if len(words_and_counts) == 0:
            continue
 
         for word in words_and_counts:
             if str(i) not in wordcounts:
                 wordcounts[str(i)] = {}
-            wordcounts[str(i)]word[0]] = word[1]
+            wordcounts[str(i)][word[0]] = word[1]
             if word[0] not in column:
                 column[word[0]] = []
     for i, f in enumerate(samples):
         for c in column:
             if str(i) in wordcounts and c in wordcounts[str(i)]:
-                column[c].append(wordcounts[str(i)][[c]])
+                column[c].append(wordcounts[str(i)][c])
             else:
-                column[c].append[0]
+                column[c].append(0)
 
     df = pd.DataFrame(column)
     total = len(df)
     
-    tf_idf = df.transform(lambda c:tfodf(c, total, doc_count(df, c.name)))
+    tf_idf = df.transform(lambda c: tfidf(c, total, doc_count(df, c.name)))
     array = tf_idf.to_numpy()
     return array
     
@@ -117,6 +117,7 @@ def reduce_dim(X,n):
     svd.fit(X)
     return svd.transform(X)
 
+    
 #print(part2(extract_features(data.data[:3]), 2))
 
 
@@ -157,35 +158,34 @@ def part3(X, y, clf_id):
     print("Accuracy:", accuracy)
     print("Report:", report)
 
-
-
 def shuffle_split(X,y):
-    X, y = shuffle(X, y) #in case it's not ok
-    
-    # z = list(zip(X, y))
-    # random.shuffle(z)
+    X, y = shuffle(X,y)
+
+    # z = list(zip(X,y))
+    # random.suffle(z)
     # X = list(map(lambda v: list(v[0]), z))
     # y = list(map(lambda v: v[1], z))
-    
+
     X_train = X[:int(len(X)*0.8)]
-    X_test = X[int(len(X)*0.8):]
+    X_test = X[int(len(X)*0.8):] 
     y_train = y[:int(len(y)*0.8)]
     y_test = y[int(len(y)*0.8):]
-    
-    return X_train, X_test, y_train, y_test 
 
+    
+    return X_train, X_test, y_train, y_test
+    
 
 def train_classifer(clf, X, y):
     assert is_classifier(clf)
     ## fill in this
-    return clf.fit(X, y)
-
+    return clf.fit(X,y)
 
 def evalute_classifier(clf, X, y):
     assert is_classifier(clf)
     #Fill this in
     pred = clf.predict(X)
     return accuracy_score(pred, y), classification_report(pred, y)
+
 
 ######
 #DONT CHANGE THIS FUNCTION
@@ -212,12 +212,12 @@ def main(model_id=None, n_dim=False):
     #part 2
     if n_dim:
         print("\n------------PART 2-----------")
-        X_dr = part2(X, n_dim)
+        X = part2(X, n_dim)
 
     #part 3
     if model_id:
        print("\n------------PART 3-----------")
-       part3(X_dr, labels[:1000], model_id)
+       part3(X, labels[:1000], model_id)
 
 
 
