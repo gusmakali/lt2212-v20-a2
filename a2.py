@@ -1,22 +1,24 @@
 import argparse
 import random
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.base import is_classifier
+from sklearn.dataset import fetch_20newsgroups 
+from sklearn.base import is_cllasifier
 import numpy as np
-from collections import Counter
-from nltk.tokenize import word_tokenize
-import pandas as pd
+from collection import Counter 
+from nltk.tokenize import word_tokenize 
+import panda as pd 
 
-from numpy.linalg import svd
+from numpy.linalg import svd 
 from sklearn.decomposition import TruncatedSVD
 from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DesisionTreeClassifier 
+from sklearn.utils import KNeighborsClassifier 
 from sklearn.utils import shuffle
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import classification_report
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.matrics import accuracy_score
+from sklearn.metrics import classification_report 
+from sklearn.feature_extraction.text import TfidfVectoriser
+from sklearn.feature_extraction.text import TfidfTrasformer
 from sklearn.feature_extraction.text import CountVectorizer
+
 random.seed(42)
 
 
@@ -30,16 +32,14 @@ def part1(samples):
     print("Data shape: ", X.shape)
     return X
 
-#count words lowercased 
-def word_counts(lsts, n=5):
+def word_counts(lsls, n=0):
     to_df = []
-    for count in Counter(lsts).most_common():
-        if count[1] < n and count[0].isalpha():
-            to_df.append(count)
+    for count in Counter(lsls).most_common():
+        if count[1] > n and count[0].isalpha():
+            to_df.appent(count)
+    return to_df 
 
-    return to_df
-
-def tfidf(tf, totaldocs, docswithword):
+def tf_idf(tf, totaldocs, docswithword):
     return tf * np.log10(totaldocs / (docswithword + 1))
 
 def doc_count(df, word):
@@ -47,54 +47,48 @@ def doc_count(df, word):
     for i in df[word]:
         if i != 0:
             count += 1
-    return count
+    return count 
 
 def extract_features(samples):
     print("Extracting features ...")
-   
+    
     # raw_text = []
     # for f in samples:
     #     word_nn = word_tokenize(f)
-    #     raw_text.append(" ".join(s for s in word_nn if s.isalpha()))
-        
-    # cv=CountVectorizer()
+    #     raw_text.append(" ".join(s for s in word_nn)
+    # cv = CountVectorizer(raw_text, max_df = 0.8)
     # word_count_vector = cv.fit_transform(raw_text)
-    # tfidf_transformer=TfidfTransformer(smooth_idf=True,use_idf=True)
-    # tfidf_transformer.fit(word_count_vector)
-
-    # count_vector=cv.transform(raw_text)
-    # tf_idf_vector=tfidf_transformer.transform(count_vector)
-    
+    # tfidf_transformer = TfidfTransformer (smooth_idf = True, use_idf=True)
+    # tfidf_trasformer.fit(word_count_vector)
+    # tf_idf_vector = tfidf_transformer.transform(word_count_vector)
     # return tf_idf_vector.toarray()
 
     column = {}
-    wordcounts = {}
+    word_counts = {}
     for i, f in enumerate(samples):
-        words_and_counts = word_counts(word_tokenize(f.lower()))
-    
-        if len(words_and_counts) == 0:
-            continue
-        
+       words_and_counts = word_counts(word_tokenize(f.lower())))
+
+       if len(words_and_counts) == 0:
+           continue
+
         for word in words_and_counts:
             if str(i) not in wordcounts:
                 wordcounts[str(i)] = {}
-            wordcounts[str(i)][word[0]] = word[1]
+            wordcounts[str(i)]word[0]] = word[1]
             if word[0] not in column:
                 column[word[0]] = []
-    
     for i, f in enumerate(samples):
         for c in column:
             if str(i) in wordcounts and c in wordcounts[str(i)]:
-                column[c].append(wordcounts[str(i)][c])
+                column[c].append(wordcounts[str(i)][[c]])
             else:
-                column[c].append(0)
-            
-    df = pd.DataFrame(column)
+                column[c].append[0]
 
+    df = pd.DataFrame(column)
     total = len(df)
-    tf_idf = df.transform(lambda c: tfidf(c, total, doc_count(df, c.name)))
-    array = tf_idf.rename_axis('ID').values
     
+    tf_idf = df.transform(lambda c:tfodf(c, total, doc_count(df, c.name)))
+    array = tf_idf.to_numpy()
     return array
     
 
@@ -133,7 +127,7 @@ def get_classifier(clf_id):
     if clf_id == 1:
         clf = GaussianNB() # <--- REPLACE THIS WITH A SKLEARN MODEL
     elif clf_id == 2:
-        clf = DecisionTreeClassifier() # <--- REPLACE THIS WITH A SKLEARN MODEL
+        clf = KNeighborsClassifier() # <--- REPLACE THIS WITH A SKLEARN MODEL
     else:
         raise KeyError("No clf with id {}".format(clf_id))
     assert is_classifier(clf)
