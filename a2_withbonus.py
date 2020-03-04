@@ -21,7 +21,7 @@ from sklearn.metrics import classification_report
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
-
+from sklearn.svm import SVC
 random.seed(42)
 
 
@@ -35,64 +35,64 @@ def part1(samples):
     print("Data shape: ", X.shape)
     return X
 
-def word_counts(lsls, n=0):
-    to_df = []
-    for count in Counter(lsls).most_common():
-        if count[1] > n and count[0].isalpha():
-            to_df.append(count)
-    return to_df 
+# def word_counts(lsls, n=0):
+#     to_df = []
+#     for count in Counter(lsls).most_common():
+#         if count[1] > n and count[0].isalpha():
+#             to_df.append(count)
+#     return to_df 
 
-def tfidf(tf, totaldocs, docswithword):
-    return tf * np.log10(totaldocs / (docswithword + 1))
+# def tfidf(tf, totaldocs, docswithword):
+#     return tf * np.log10(totaldocs / (docswithword + 1))
 
-def doc_count(df, word):
-    count = 0
-    for i in df[word]:
-        if i != 0:
-            count += 1
-    return count 
+# def doc_count(df, word):
+#     count = 0
+#     for i in df[word]:
+#         if i != 0:
+#             count += 1
+#     return count 
 
 def extract_features(samples):
     print("Extracting features ...")
     
-    # raw_text = []
-    # for f in samples:
-    #     word_nn = word_tokenize(f)
-    #     raw_text.append(" ".join(s for s in word_nn)
-    # cv = CountVectorizer(raw_text, max_df = 0.8)
-    # word_count_vector = cv.fit_transform(raw_text)
-    # tfidf_transformer = TfidfTransformer (smooth_idf = True, use_idf=True)
-    # tfidf_trasformer.fit(word_count_vector)
-    # tf_idf_vector = tfidf_transformer.transform(word_count_vector)
-    # return tf_idf_vector.toarray()
+    raw_text = []
+    for f in samples:
+        word_nn = word_tokenize(f)
+        raw_text.append(" ".join(s for s in word_nn))
+    cv = CountVectorizer(raw_text, max_df = 0.8)
+    word_count_vector = cv.fit_transform(raw_text)
+    tfidf_transformer = TfidfTransformer (smooth_idf = True, use_idf=True)
+    tfidf_transformer.fit(word_count_vector)
+    tf_idf_vector = tfidf_transformer.transform(word_count_vector)
+    return tf_idf_vector.toarray()
 
-    column = {}
-    wordcounts = {}
-    for i, f in enumerate(samples):
-        words_and_counts = word_counts(word_tokenize(f.lower()))
+    # column = {}
+    # wordcounts = {}
+    # for i, f in enumerate(samples):
+    #     words_and_counts = word_counts(word_tokenize(f.lower()))
 
-        if len(words_and_counts) == 0:
-           continue
+    #     if len(words_and_counts) == 0:
+    #        continue
 
-        for word in words_and_counts:
-            if str(i) not in wordcounts:
-                wordcounts[str(i)] = {}
-            wordcounts[str(i)][word[0]] = word[1]
-            if word[0] not in column:
-                column[word[0]] = []
-    for i, f in enumerate(samples):
-        for c in column:
-            if str(i) in wordcounts and c in wordcounts[str(i)]:
-                column[c].append(wordcounts[str(i)][c])
-            else:
-                column[c].append(0)
+    #     for word in words_and_counts:
+    #         if str(i) not in wordcounts:
+    #             wordcounts[str(i)] = {}
+    #         wordcounts[str(i)][word[0]] = word[1]
+    #         if word[0] not in column:
+    #             column[word[0]] = []
+    # for i, f in enumerate(samples):
+    #     for c in column:
+    #         if str(i) in wordcounts and c in wordcounts[str(i)]:
+    #             column[c].append(wordcounts[str(i)][c])
+    #         else:
+    #             column[c].append(0)
 
-    df = pd.DataFrame(column)
-    total = len(df)
+    # df = pd.DataFrame(column)
+    # total = len(df)
     
-    tf_idf = df.transform(lambda c: tfidf(c, total, doc_count(df, c.name)))
-    array = tf_idf.to_numpy()
-    return array
+    # tf_idf = df.transform(lambda c: tfidf(c, total, doc_count(df, c.name)))
+    # array = tf_idf.to_numpy()
+    # return array
     
 
 # data = fetch_20newsgroups(subset='all', shuffle=True, random_state=42)
@@ -164,11 +164,6 @@ def part3(X, y, clf_id):
 def shuffle_split(X,y):
     X, y = shuffle(X,y)
 
-    # z = list(zip(X,y))
-    # random.suffle(z)
-    # X = list(map(lambda v: list(v[0]), z))
-    # y = list(map(lambda v: v[1], z))
-
     X_train = X[:int(len(X)*0.8)]
     X_test = X[int(len(X)*0.8):] 
     y_train = y[:int(len(y)*0.8)]
@@ -215,7 +210,7 @@ def main(model_id=None, n_dim=False):
     #part 2
     if n_dim:
         print("\n------------PART 2-----------")
-        X = part2(X, n_dim)
+        X = part2(X, n_dim) 
 
     #part 3
     if model_id:
