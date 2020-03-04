@@ -205,7 +205,7 @@ def main(model_id=None, n_dim=False):
 
     #PART 1
     print("\n------------PART 1-----------")
-    X = part1(samples[:1000])
+    X = part1(samples[:4000])
 
     #part 2
     if n_dim:
@@ -215,7 +215,7 @@ def main(model_id=None, n_dim=False):
     #part 3
     if model_id:
        print("\n------------PART 3-----------")
-       part3(X, labels[:1000], model_id)
+       part3(X, labels[:4000], model_id)
 
 
 
